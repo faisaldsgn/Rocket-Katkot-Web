@@ -3,4 +3,4 @@
 Survive the longest by tapping to boost, while avoiding the sea & spikes...GOOD LUCK!
 
 [Game Link
-](https://faisalalmahmoud.github.io/Rocket-Katkot-Web/)
+](https://faisaldsgn.github.io/Rocket-Katkot-Web/)
