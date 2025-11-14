@@ -78,7 +78,7 @@ isConditionTrue_0 = false;
 isConditionTrue_0 = !(gdjs.evtTools.systemInfo.hasTouchScreen(runtimeScene));
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(14808908);
+{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(13230316);
 }
 }
 if (isConditionTrue_0) {
@@ -230,7 +230,7 @@ gdjs.copyArray(gdjs.StartCode.GDPlayObjects1_1final, gdjs.StartCode.GDPlayObject
 }
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(14814068);
+{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(13235476);
 }
 }
 if (isConditionTrue_0) {
@@ -257,7 +257,7 @@ for (var i = 0, k = 0, l = gdjs.StartCode.GDXObjects1.length;i<l;++i) {
 gdjs.StartCode.GDXObjects1.length = k;
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(14814756);
+{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(13236164);
 }
 }
 if (isConditionTrue_0) {
@@ -284,7 +284,7 @@ for (var i = 0, k = 0, l = gdjs.StartCode.GDLinkedinObjects1.length;i<l;++i) {
 gdjs.StartCode.GDLinkedinObjects1.length = k;
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(14815548);
+{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(13236956);
 }
 }
 if (isConditionTrue_0) {
@@ -311,7 +311,7 @@ for (var i = 0, k = 0, l = gdjs.StartCode.GDQuestionMarkObjects1.length;i<l;++i)
 gdjs.StartCode.GDQuestionMarkObjects1.length = k;
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(14816444);
+{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(13237852);
 }
 }
 if (isConditionTrue_0) {
@@ -338,7 +338,7 @@ for (var i = 0, k = 0, l = gdjs.StartCode.GDPlusObjects1.length;i<l;++i) {
 gdjs.StartCode.GDPlusObjects1.length = k;
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(14817188);
+{isConditionTrue_0 = runtimeScene.getOnceTriggers().triggerOnce(13238596);
 }
 }
 if (isConditionTrue_0) {
