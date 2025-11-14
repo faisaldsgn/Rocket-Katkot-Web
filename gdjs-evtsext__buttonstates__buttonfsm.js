@@ -43,6 +43,38 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM = class ButtonFSM extends gdjs.R
     return true;
   }
 
+  // Network sync:
+  getNetworkSyncData(syncOptions) {
+    return {
+      ...super.getNetworkSyncData(syncOptions),
+      props: {
+        
+    ShouldCheckHovering: this._behaviorData.ShouldCheckHovering,
+    State: this._behaviorData.State,
+    TouchId: this._behaviorData.TouchId,
+    TouchIsInside: this._behaviorData.TouchIsInside,
+    MouseIsInside: this._behaviorData.MouseIsInside,
+    Index: this._behaviorData.Index,
+      }
+    };
+  }
+  updateFromNetworkSyncData(networkSyncData, options) {
+    super.updateFromNetworkSyncData(networkSyncData, options);
+    
+    if (networkSyncData.props.ShouldCheckHovering !== undefined)
+      this._behaviorData.ShouldCheckHovering = networkSyncData.props.ShouldCheckHovering;
+    if (networkSyncData.props.State !== undefined)
+      this._behaviorData.State = networkSyncData.props.State;
+    if (networkSyncData.props.TouchId !== undefined)
+      this._behaviorData.TouchId = networkSyncData.props.TouchId;
+    if (networkSyncData.props.TouchIsInside !== undefined)
+      this._behaviorData.TouchIsInside = networkSyncData.props.TouchIsInside;
+    if (networkSyncData.props.MouseIsInside !== undefined)
+      this._behaviorData.MouseIsInside = networkSyncData.props.MouseIsInside;
+    if (networkSyncData.props.Index !== undefined)
+      this._behaviorData.Index = networkSyncData.props.Index;
+  }
+
   // Properties:
   
   _getShouldCheckHovering() {
@@ -118,6 +150,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.getSharedData = function(instanc
 
 // Methods:
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext = {};
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4_1final = [];
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects1= [];
@@ -145,7 +178,8 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonS
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setMouseIsInside(false);
 }
-}}
+}
+}
 
 }
 
@@ -180,7 +214,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setMouseIsInside(true);
 }
-}}
+}
+}
 
 }
 
@@ -201,7 +236,8 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonS
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setTouchIsInside(false);
 }
-}}
+}
+}
 
 }
 
@@ -236,7 +272,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects2.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setTouchIsInside(true);
 }
-}}
+}
+}
 
 }
 
@@ -299,7 +336,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setState("PressedInside");
 }
-}}
+}
+}
 
 }
 
@@ -326,10 +364,12 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setTouchId(gdjs.evtTools.input.getStartedTouchOrMouseIdentifier(runtimeScene, (gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getIndex())));
 }
-}{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4.length ;i < len;++i) {
+}
+{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setTouchIsInside(true);
 }
 }
+
 { //Subevents
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.eventsList1(runtimeScene, eventsFunctionContext);} //End of subevents
 }
@@ -347,7 +387,8 @@ gdjs.copyArray(gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepP
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setIndex(gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getIndex() + (1));
 }
-}}
+}
+}
 
 }
 
@@ -386,6 +427,7 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonS
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setIndex(0);
 }
 }
+
 { //Subevents
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.eventsList3(runtimeScene, eventsFunctionContext);} //End of subevents
 }
@@ -425,7 +467,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setState("Idle");
 }
-}}
+}
+}
 
 }
 
@@ -460,7 +503,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setState("Hovered");
 }
-}}
+}
+}
 
 }
 
@@ -495,7 +539,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setState("PressedOutside");
 }
-}}
+}
+}
 
 }
 
@@ -530,7 +575,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects2.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setState("PressedInside");
 }
-}}
+}
+}
 
 }
 
@@ -557,7 +603,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects2.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setState("Validated");
 }
-}}
+}
+}
 
 }
 
@@ -592,7 +639,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setState("Idle");
 }
-}}
+}
+}
 
 }
 
@@ -612,6 +660,7 @@ if (isConditionTrue_0) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setTouchId(0);
 }
 }
+
 { //Subevents
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.eventsList6(runtimeScene, eventsFunctionContext);} //End of subevents
 }
@@ -647,7 +696,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects2.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setState("Idle");
 }
-}}
+}
+}
 
 }
 
@@ -695,6 +745,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEvents = fun
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -708,6 +759,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -720,14 +774,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -735,7 +790,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -757,10 +812,17 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContex
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects5.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.eventsList9(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects2.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects3.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects4.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.doStepPostEventsContext.GDObjectObjects5.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext = {};
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.GDObjectObjects2= [];
 
@@ -774,9 +836,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).ResetState((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
+    gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).ResetState(eventsFunctionContext);
 }
-}}
+}
+}
 
 }
 
@@ -787,6 +850,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivate = functio
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -800,6 +864,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -812,14 +879,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -827,7 +895,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -846,10 +914,14 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.GD
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.onDeActivateContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext = {};
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDObjectObjects2= [];
 
@@ -865,10 +937,12 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonS
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setState("Idle");
 }
-}{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDObjectObjects1.length ;i < len;++i) {
+}
+{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setTouchId(0);
 }
-}}
+}
+}
 
 }
 
@@ -879,6 +953,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetState = function(
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -892,6 +967,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -904,14 +982,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -919,7 +998,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -938,10 +1017,14 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDOb
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.ResetStateContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdleContext = {};
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdleContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdleContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdleContext.GDObjectObjects2= [];
 
@@ -963,7 +1046,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.proto
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdleContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -974,6 +1058,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdle = function(pare
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -987,6 +1072,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -999,14 +1087,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1014,7 +1103,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1033,10 +1122,14 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdleContext.GDObject
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdleContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdleContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdleContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsIdleContext.GDObjectObjects2.length = 0;
+
 
 return !!eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClickedContext = {};
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClickedContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClickedContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClickedContext.GDObjectObjects2= [];
 
@@ -1058,7 +1151,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.proto
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClickedContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -1069,6 +1163,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClicked = function(p
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1082,6 +1177,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1094,14 +1192,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1109,7 +1208,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1128,10 +1227,14 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClickedContext.GDObj
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClickedContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClickedContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClickedContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsClickedContext.GDObjectObjects2.length = 0;
+
 
 return !!eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHoveredContext = {};
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHoveredContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHoveredContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHoveredContext.GDObjectObjects2= [];
 
@@ -1153,7 +1256,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.proto
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHoveredContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -1164,6 +1268,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHovered = function(p
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1177,6 +1282,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1189,14 +1297,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1204,7 +1313,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1223,10 +1332,14 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHoveredContext.GDObj
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHoveredContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHoveredContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHoveredContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsHoveredContext.GDObjectObjects2.length = 0;
+
 
 return !!eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext = {};
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext.GDObjectObjects2= [];
 
@@ -1248,7 +1361,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.proto
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -1268,7 +1382,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.proto
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -1279,6 +1394,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocused = function(p
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1292,6 +1408,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1304,14 +1423,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1319,7 +1439,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1338,10 +1458,14 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext.GDObj
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsFocusedContext.GDObjectObjects2.length = 0;
+
 
 return !!eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedContext = {};
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedContext.GDObjectObjects2= [];
 
@@ -1363,7 +1487,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.proto
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -1374,6 +1499,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressed = function(p
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1387,6 +1513,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1399,14 +1528,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1414,7 +1544,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1433,10 +1563,14 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedContext.GDObj
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedContext.GDObjectObjects2.length = 0;
+
 
 return !!eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutsideContext = {};
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutsideContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutsideContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutsideContext.GDObjectObjects2= [];
 
@@ -1458,7 +1592,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.proto
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutsideContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -1469,6 +1604,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutside = fun
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1482,6 +1618,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1494,14 +1633,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1509,7 +1649,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1528,10 +1668,14 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutsideContex
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutsideContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutsideContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutsideContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.IsPressedOutsideContext.GDObjectObjects2.length = 0;
+
 
 return !!eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext = {};
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjectObjects2= [];
 
@@ -1544,7 +1688,8 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.eventsL
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getTouchId()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getTouchId());}
+}
 
 }
 
@@ -1555,6 +1700,7 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchId = function(par
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1568,6 +1714,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1580,14 +1729,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1595,7 +1745,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1614,6 +1764,9 @@ gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjec
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonFSM.ButtonFSM.prototype.TouchIdContext.GDObjectObjects2.length = 0;
+
 
 return Number(eventsFunctionContext.returnValue) || 0;
 }

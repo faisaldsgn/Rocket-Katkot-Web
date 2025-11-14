@@ -34,6 +34,29 @@ gdjs.evtsExt__Flash__Flash.Flash = class Flash extends gdjs.RuntimeBehavior {
     return true;
   }
 
+  // Network sync:
+  getNetworkSyncData(syncOptions) {
+    return {
+      ...super.getNetworkSyncData(syncOptions),
+      props: {
+        
+    HalfPeriodTime: this._behaviorData.HalfPeriodTime,
+    IsFlashing: this._behaviorData.IsFlashing,
+    FlashDuration: this._behaviorData.FlashDuration,
+      }
+    };
+  }
+  updateFromNetworkSyncData(networkSyncData, options) {
+    super.updateFromNetworkSyncData(networkSyncData, options);
+    
+    if (networkSyncData.props.HalfPeriodTime !== undefined)
+      this._behaviorData.HalfPeriodTime = networkSyncData.props.HalfPeriodTime;
+    if (networkSyncData.props.IsFlashing !== undefined)
+      this._behaviorData.IsFlashing = networkSyncData.props.IsFlashing;
+    if (networkSyncData.props.FlashDuration !== undefined)
+      this._behaviorData.FlashDuration = networkSyncData.props.FlashDuration;
+  }
+
   // Properties:
   
   _getHalfPeriodTime() {
@@ -85,6 +108,7 @@ gdjs.evtsExt__Flash__Flash.Flash.getSharedData = function(instanceContainer, beh
 
 // Methods:
 gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext = {};
+gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.idToCallbackMap = new Map();
 gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects1= [];
 gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects2= [];
 gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects3= [];
@@ -110,11 +134,13 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreE
 gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects2.length = k;
 if (isConditionTrue_0) {
 /* Reuse gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects2 */
-{gdjs.evtsExt__Flash__ToggleVisibility.func(runtimeScene, gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.mapOfGDgdjs_9546evtsExt_9595_9595Flash_9595_9595Flash_9546Flash_9546prototype_9546doStepPreEventsContext_9546GDObjectObjects2Objects, (typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
-}{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects2.length ;i < len;++i) {
+{gdjs.evtsExt__Flash__ToggleVisibility.func(runtimeScene, gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.mapOfGDgdjs_9546evtsExt_9595_9595Flash_9595_9595Flash_9546Flash_9546prototype_9546doStepPreEventsContext_9546GDObjectObjects2Objects, eventsFunctionContext);
+}
+{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects2.length ;i < len;++i) {
     gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects2[i].resetTimer("Flash_Visibility_Timer");
 }
-}}
+}
+}
 
 }
 
@@ -149,9 +175,10 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObject
 if (isConditionTrue_0) {
 /* Reuse gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects1 */
 {for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).Stop((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
+    gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).Stop(eventsFunctionContext);
 }
-}}
+}
+}
 
 }
 
@@ -203,6 +230,7 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEvents = function(parentEven
 this._onceTriggers.startNewFrame();
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -216,6 +244,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("Flash"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("Flash"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -228,14 +259,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -243,7 +275,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -263,10 +295,15 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObject
 gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects3.length = 0;
 
 gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.eventsList3(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects2.length = 0;
+gdjs.evtsExt__Flash__Flash.Flash.prototype.doStepPreEventsContext.GDObjectObjects3.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext = {};
+gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.idToCallbackMap = new Map();
 gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1= [];
 gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects2= [];
 
@@ -281,7 +318,7 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__Flash__
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
 for (var i = 0, k = 0, l = gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length;i<l;++i) {
-    if ( !(gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).IsFlashing((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined))) ) {
+    if ( !(gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).IsFlashing(eventsFunctionContext)) ) {
         isConditionTrue_0 = true;
         gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1[k] = gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1[i];
         ++k;
@@ -290,14 +327,17 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashConte
 gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
 /* Reuse gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1 */
-{gdjs.evtsExt__Flash__ToggleVisibility.func(runtimeScene, gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.mapOfGDgdjs_9546evtsExt_9595_9595Flash_9595_9595Flash_9546Flash_9546prototype_9546FlashContext_9546GDObjectObjects1Objects, (typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
-}{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length ;i < len;++i) {
+{gdjs.evtsExt__Flash__ToggleVisibility.func(runtimeScene, gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.mapOfGDgdjs_9546evtsExt_9595_9595Flash_9595_9595Flash_9546Flash_9546prototype_9546FlashContext_9546GDObjectObjects1Objects, eventsFunctionContext);
+}
+{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setIsFlashing(true);
 }
-}{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length ;i < len;++i) {
+}
+{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1[i].resetTimer("Flash_Visibility_Timer");
 }
-}}
+}
+}
 
 }
 
@@ -311,10 +351,12 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__Flash__
 {for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1[i].resetTimer("Flash_Visibility_Duration_Timer");
 }
-}{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFlashDuration((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("FlashDuration")) || 0 : 0));
 }
-}}
+{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length ;i < len;++i) {
+    gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFlashDuration((Number(eventsFunctionContext.getArgument("FlashDuration")) || 0));
+}
+}
+}
 
 }
 
@@ -325,6 +367,7 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.Flash = function(FlashDuration, paren
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -338,6 +381,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("Flash"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("Flash"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -350,14 +396,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -365,7 +412,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -385,10 +432,14 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length 
 gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__Flash__Flash.Flash.prototype.FlashContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext = {};
+gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext.idToCallbackMap = new Map();
 gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext.GDObjectObjects1= [];
 gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext.GDObjectObjects2= [];
 
@@ -400,7 +451,8 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext.eventsList0 = funct
 
 let isConditionTrue_0 = false;
 {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = false; }}}
+{eventsFunctionContext.returnValue = false;}
+}
 
 }
 
@@ -420,7 +472,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashing
 }
 gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -431,6 +484,7 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashing = function(parentEventsFun
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -444,6 +498,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("Flash"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("Flash"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -456,14 +513,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -471,7 +529,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -490,10 +548,14 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext.GDObjectObjects1.le
 gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__Flash__Flash.Flash.prototype.IsFlashingContext.GDObjectObjects2.length = 0;
+
 
 return !!eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext = {};
+gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.idToCallbackMap = new Map();
 gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.GDObjectObjects1= [];
 gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.GDObjectObjects2= [];
 
@@ -507,9 +569,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).Stop((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
+    gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).Stop(eventsFunctionContext);
 }
-}}
+}
+}
 
 }
 
@@ -520,6 +583,7 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivate = function(parentEventsF
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -533,6 +597,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("Flash"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("Flash"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -545,14 +612,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -560,7 +628,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -579,10 +647,14 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.GDObjectObjects1.
 gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__Flash__Flash.Flash.prototype.onDeActivateContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext = {};
+gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.idToCallbackMap = new Map();
 gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1= [];
 gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects2= [];
 
@@ -608,16 +680,20 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1[i].hide(false);
 }
-}{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1.length ;i < len;++i) {
+}
+{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setIsFlashing(false);
 }
-}{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1.length ;i < len;++i) {
+}
+{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1[i].removeTimer("Flash_Visibility_Timer");
 }
-}{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1.length ;i < len;++i) {
+}
+{for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1[i].removeTimer("Flash_Visibility_Duration_Timer");
 }
-}}
+}
+}
 
 }
 
@@ -628,6 +704,7 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.Stop = function(parentEventsFunctionC
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -641,6 +718,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("Flash"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("Flash"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -653,14 +733,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -668,7 +749,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -687,10 +768,14 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1.length =
 gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__Flash__Flash.Flash.prototype.StopContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext = {};
+gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.idToCallbackMap = new Map();
 gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects1= [];
 gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects2= [];
 
@@ -703,7 +788,8 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.eventsList0 = f
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getHalfPeriodTime()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getHalfPeriodTime());}
+}
 
 }
 
@@ -714,6 +800,7 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTime = function(parentEvent
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -727,6 +814,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("Flash"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("Flash"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -739,14 +829,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -754,7 +845,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -773,10 +864,14 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects
 gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__Flash__Flash.Flash.prototype.HalfPeriodTimeContext.GDObjectObjects2.length = 0;
+
 
 return Number(eventsFunctionContext.returnValue) || 0;
 }
 gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext = {};
+gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.idToCallbackMap = new Map();
 gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.GDObjectObjects1= [];
 gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.GDObjectObjects2= [];
 
@@ -790,9 +885,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setHalfPeriodTime((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("Value")) || 0 : 0));
+    gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setHalfPeriodTime((Number(eventsFunctionContext.getArgument("Value")) || 0));
 }
-}}
+}
+}
 
 }
 
@@ -803,6 +899,7 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTime = function(Value, p
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -816,6 +913,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("Flash"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("Flash"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -828,14 +928,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -843,7 +944,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -863,6 +964,9 @@ gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.GDObjectObje
 gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__Flash__Flash.Flash.prototype.SetHalfPeriodTimeContext.GDObjectObjects2.length = 0;
+
 
 return;
 }

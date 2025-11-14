@@ -6,6 +6,7 @@ if (typeof gdjs.evtsExt__Flash__IsTinted !== "undefined") {
 }
 
 gdjs.evtsExt__Flash__IsTinted = {};
+gdjs.evtsExt__Flash__IsTinted.idToCallbackMap = new Map();
 gdjs.evtsExt__Flash__IsTinted.GDObjectObjects1= [];
 gdjs.evtsExt__Flash__IsTinted.GDObjectObjects2= [];
 
@@ -19,9 +20,10 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__Flash__
 
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
-isConditionTrue_0 = !(gdjs.evtsExt__Flash__ColorTint.func(runtimeScene, gdjs.evtsExt__Flash__IsTinted.mapOfGDgdjs_9546evtsExt_9595_9595Flash_9595_9595IsTinted_9546GDObjectObjects1Objects, (typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined)) == "255;255;255");
+isConditionTrue_0 = !(gdjs.evtsExt__Flash__ColorTint.func(runtimeScene, gdjs.evtsExt__Flash__IsTinted.mapOfGDgdjs_9546evtsExt_9595_9595Flash_9595_9595IsTinted_9546GDObjectObjects1Objects, eventsFunctionContext) == "255;255;255");
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -29,6 +31,7 @@ if (isConditionTrue_0) {
 };
 
 gdjs.evtsExt__Flash__IsTinted.func = function(runtimeScene, Object, parentEventsFunctionContext) {
+let scopeInstanceContainer = null;
 var eventsFunctionContext = {
   _objectsMap: {
 "Object": Object
@@ -38,6 +41,9 @@ var eventsFunctionContext = {
 },
   _behaviorNamesMap: {
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("Flash"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("Flash"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -50,14 +56,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -65,7 +72,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -84,6 +91,9 @@ gdjs.evtsExt__Flash__IsTinted.GDObjectObjects1.length = 0;
 gdjs.evtsExt__Flash__IsTinted.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__Flash__IsTinted.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__Flash__IsTinted.GDObjectObjects1.length = 0;
+gdjs.evtsExt__Flash__IsTinted.GDObjectObjects2.length = 0;
+
 
 return "" + eventsFunctionContext.returnValue;
 }

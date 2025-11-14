@@ -55,6 +55,50 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween = class Bu
     return true;
   }
 
+  // Network sync:
+  getNetworkSyncData(syncOptions) {
+    return {
+      ...super.getNetworkSyncData(syncOptions),
+      props: {
+        
+    ButtonFSM: this._behaviorData.ButtonFSM,
+    Tween: this._behaviorData.Tween,
+    IdleColorTint: this._behaviorData.IdleColorTint,
+    FocusedColorTint: this._behaviorData.FocusedColorTint,
+    PressedColorTint: this._behaviorData.PressedColorTint,
+    FadeInDuration: this._behaviorData.FadeInDuration,
+    FadeOutDuration: this._behaviorData.FadeOutDuration,
+    FadeInEasing: this._behaviorData.FadeInEasing,
+    FadeOutEasing: this._behaviorData.FadeOutEasing,
+    PreviousState: this._behaviorData.PreviousState,
+      }
+    };
+  }
+  updateFromNetworkSyncData(networkSyncData, options) {
+    super.updateFromNetworkSyncData(networkSyncData, options);
+    
+    if (networkSyncData.props.ButtonFSM !== undefined)
+      this._behaviorData.ButtonFSM = networkSyncData.props.ButtonFSM;
+    if (networkSyncData.props.Tween !== undefined)
+      this._behaviorData.Tween = networkSyncData.props.Tween;
+    if (networkSyncData.props.IdleColorTint !== undefined)
+      this._behaviorData.IdleColorTint = networkSyncData.props.IdleColorTint;
+    if (networkSyncData.props.FocusedColorTint !== undefined)
+      this._behaviorData.FocusedColorTint = networkSyncData.props.FocusedColorTint;
+    if (networkSyncData.props.PressedColorTint !== undefined)
+      this._behaviorData.PressedColorTint = networkSyncData.props.PressedColorTint;
+    if (networkSyncData.props.FadeInDuration !== undefined)
+      this._behaviorData.FadeInDuration = networkSyncData.props.FadeInDuration;
+    if (networkSyncData.props.FadeOutDuration !== undefined)
+      this._behaviorData.FadeOutDuration = networkSyncData.props.FadeOutDuration;
+    if (networkSyncData.props.FadeInEasing !== undefined)
+      this._behaviorData.FadeInEasing = networkSyncData.props.FadeInEasing;
+    if (networkSyncData.props.FadeOutEasing !== undefined)
+      this._behaviorData.FadeOutEasing = networkSyncData.props.FadeOutEasing;
+    if (networkSyncData.props.PreviousState !== undefined)
+      this._behaviorData.PreviousState = networkSyncData.props.PreviousState;
+  }
+
   // Properties:
   
   _getButtonFSM() {
@@ -145,6 +189,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.getSharedD
 
 // Methods:
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext.GDObjectObjects2= [];
 
@@ -160,7 +205,8 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonS
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext.GDObjectObjects1[i].setColor((gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getIdleColorTint()));
 }
-}}
+}
+}
 
 }
 
@@ -171,6 +217,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -186,6 +233,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -198,14 +248,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -213,7 +264,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -232,10 +283,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.onCreatedContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects3= [];
@@ -264,10 +319,12 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects3.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setPreviousState("Focused");
 }
-}{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects3.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).FadeIn((gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFocusedColorTint()), (typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
 }
-}}
+{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects3.length ;i < len;++i) {
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).FadeIn((gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects3[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFocusedColorTint()), eventsFunctionContext);
+}
+}
+}
 
 }
 
@@ -291,10 +348,12 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setPreviousState("Focused");
 }
-}{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).FadeOut((gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFocusedColorTint()), (typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
 }
-}}
+{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2.length ;i < len;++i) {
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).FadeOut((gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFocusedColorTint()), eventsFunctionContext);
+}
+}
+}
 
 }
 
@@ -308,7 +367,7 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonS
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
 for (var i = 0, k = 0, l = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2.length;i<l;++i) {
-    if ( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("ButtonFSM")).IsIdle((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined)) ) {
+    if ( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("ButtonFSM")).IsIdle(eventsFunctionContext) ) {
         isConditionTrue_0 = true;
         gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[k] = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i];
         ++k;
@@ -331,10 +390,12 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setPreviousState("Idle");
 }
-}{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).FadeOut((gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getIdleColorTint()), (typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
 }
-}}
+{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2.length ;i < len;++i) {
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).FadeOut((gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getIdleColorTint()), eventsFunctionContext);
+}
+}
+}
 
 }
 
@@ -346,7 +407,7 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonS
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
 for (var i = 0, k = 0, l = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2.length;i<l;++i) {
-    if ( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("ButtonFSM")).IsFocused((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined)) ) {
+    if ( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("ButtonFSM")).IsFocused(eventsFunctionContext) ) {
         isConditionTrue_0 = true;
         gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[k] = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2[i];
         ++k;
@@ -369,7 +430,7 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonS
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
 for (var i = 0, k = 0, l = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1.length;i<l;++i) {
-    if ( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("ButtonFSM")).IsPressed((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined)) ) {
+    if ( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("ButtonFSM")).IsPressed(eventsFunctionContext) ) {
         isConditionTrue_0 = true;
         gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1[k] = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1[i];
         ++k;
@@ -392,10 +453,12 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setPreviousState("Pressed");
 }
-}{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).FadeIn((gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getPressedColorTint()), (typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
 }
-}}
+{for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1.length ;i < len;++i) {
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).FadeIn((gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getPressedColorTint()), eventsFunctionContext);
+}
+}
+}
 
 }
 
@@ -415,6 +478,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 this._onceTriggers.startNewFrame();
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -430,6 +494,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -442,14 +509,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -457,7 +525,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -478,10 +546,16 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects4.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.eventsList2(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects2.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects3.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.doStepPreEventsContext.GDObjectObjects4.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects2= [];
 
@@ -495,9 +569,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Tween")).addObjectColorTween("__ButtonColorTintTween.Fade", (typeof eventsFunctionContext !== 'undefined' ? "" + eventsFunctionContext.getArgument("Value") : ""), (gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeInEasing()), 1000 * (gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeInDuration()), false, true);
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Tween")).addObjectColorTween("__ButtonColorTintTween.Fade", "" + eventsFunctionContext.getArgument("Value"), (gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeInEasing()), 1000 * (gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeInDuration()), false, true);
 }
-}}
+}
+}
 
 }
 
@@ -508,6 +583,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -523,6 +599,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -535,14 +614,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -550,7 +630,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -570,10 +650,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects2= [];
 
@@ -587,9 +671,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Tween")).addObjectColorTween("__ButtonColorTintTween.Fade", (typeof eventsFunctionContext !== 'undefined' ? "" + eventsFunctionContext.getArgument("Value") : ""), (gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeOutEasing()), 1000 * (gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeOutDuration()), false, true);
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Tween")).addObjectColorTween("__ButtonColorTintTween.Fade", "" + eventsFunctionContext.getArgument("Value"), (gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeOutEasing()), 1000 * (gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeOutDuration()), false, true);
 }
-}}
+}
+}
 
 }
 
@@ -600,6 +685,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -615,6 +701,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -627,14 +716,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -642,7 +732,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -662,10 +752,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.GDObjectObjects2= [];
 
@@ -678,7 +772,8 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getIdleColorTint()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getIdleColorTint());}
+}
 
 }
 
@@ -689,6 +784,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -704,6 +800,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -716,14 +815,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -731,7 +831,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -750,10 +850,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.IdleColorTintContext.GDObjectObjects2.length = 0;
+
 
 return "" + eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.GDObjectObjects2= [];
 
@@ -767,9 +871,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setIdleColorTint((typeof eventsFunctionContext !== 'undefined' ? "" + eventsFunctionContext.getArgument("Value") : ""));
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setIdleColorTint("" + eventsFunctionContext.getArgument("Value"));
 }
-}}
+}
+}
 
 }
 
@@ -780,6 +885,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -795,6 +901,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -807,14 +916,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -822,7 +932,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -842,10 +952,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetIdleColorTintContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.GDObjectObjects2= [];
 
@@ -858,7 +972,8 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFocusedColorTint()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFocusedColorTint());}
+}
 
 }
 
@@ -869,6 +984,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -884,6 +1000,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -896,14 +1015,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -911,7 +1031,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -930,10 +1050,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FocusedColorTintContext.GDObjectObjects2.length = 0;
+
 
 return "" + eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.GDObjectObjects2= [];
 
@@ -947,9 +1071,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFocusedColorTint((typeof eventsFunctionContext !== 'undefined' ? "" + eventsFunctionContext.getArgument("Value") : ""));
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFocusedColorTint("" + eventsFunctionContext.getArgument("Value"));
 }
-}}
+}
+}
 
 }
 
@@ -960,6 +1085,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -975,6 +1101,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -987,14 +1116,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1002,7 +1132,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1022,10 +1152,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFocusedColorTintContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.GDObjectObjects2= [];
 
@@ -1038,7 +1172,8 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getPressedColorTint()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getPressedColorTint());}
+}
 
 }
 
@@ -1049,6 +1184,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1064,6 +1200,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1076,14 +1215,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1091,7 +1231,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1110,10 +1250,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.PressedColorTintContext.GDObjectObjects2.length = 0;
+
 
 return "" + eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.GDObjectObjects2= [];
 
@@ -1127,9 +1271,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setPressedColorTint((typeof eventsFunctionContext !== 'undefined' ? "" + eventsFunctionContext.getArgument("Value") : ""));
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setPressedColorTint("" + eventsFunctionContext.getArgument("Value"));
 }
-}}
+}
+}
 
 }
 
@@ -1140,6 +1285,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1155,6 +1301,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1167,14 +1316,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1182,7 +1332,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1202,10 +1352,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetPressedColorTintContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.GDObjectObjects2= [];
 
@@ -1218,7 +1372,8 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeInDuration()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeInDuration());}
+}
 
 }
 
@@ -1229,6 +1384,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1244,6 +1400,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1256,14 +1415,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1271,7 +1431,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1290,10 +1450,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInDurationContext.GDObjectObjects2.length = 0;
+
 
 return Number(eventsFunctionContext.returnValue) || 0;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.GDObjectObjects2= [];
 
@@ -1307,9 +1471,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFadeInDuration((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("Value")) || 0 : 0));
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFadeInDuration((Number(eventsFunctionContext.getArgument("Value")) || 0));
 }
-}}
+}
+}
 
 }
 
@@ -1320,6 +1485,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1335,6 +1501,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1347,14 +1516,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1362,7 +1532,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1382,10 +1552,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInDurationContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.GDObjectObjects2= [];
 
@@ -1398,7 +1572,8 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeOutDuration()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeOutDuration());}
+}
 
 }
 
@@ -1409,6 +1584,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1424,6 +1600,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1436,14 +1615,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1451,7 +1631,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1470,10 +1650,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutDurationContext.GDObjectObjects2.length = 0;
+
 
 return Number(eventsFunctionContext.returnValue) || 0;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.GDObjectObjects2= [];
 
@@ -1487,9 +1671,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFadeOutDuration((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("Value")) || 0 : 0));
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFadeOutDuration((Number(eventsFunctionContext.getArgument("Value")) || 0));
 }
-}}
+}
+}
 
 }
 
@@ -1500,6 +1685,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1515,6 +1701,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1527,14 +1716,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1542,7 +1732,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1562,10 +1752,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutDurationContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.GDObjectObjects2= [];
 
@@ -1578,7 +1772,8 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeInEasing()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeInEasing());}
+}
 
 }
 
@@ -1589,6 +1784,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1604,6 +1800,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1616,14 +1815,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1631,7 +1831,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1650,10 +1850,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeInEasingContext.GDObjectObjects2.length = 0;
+
 
 return "" + eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.GDObjectObjects2= [];
 
@@ -1667,9 +1871,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFadeInEasing((typeof eventsFunctionContext !== 'undefined' ? "" + eventsFunctionContext.getArgument("Value") : ""));
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFadeInEasing("" + eventsFunctionContext.getArgument("Value"));
 }
-}}
+}
+}
 
 }
 
@@ -1680,6 +1885,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1695,6 +1901,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1707,14 +1916,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1722,7 +1932,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1742,10 +1952,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeInEasingContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.GDObjectObjects2= [];
 
@@ -1758,7 +1972,8 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeOutEasing()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getFadeOutEasing());}
+}
 
 }
 
@@ -1769,6 +1984,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1784,6 +2000,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1796,14 +2015,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1811,7 +2031,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1830,10 +2050,14 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.FadeOutEasingContext.GDObjectObjects2.length = 0;
+
 
 return "" + eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext = {};
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.GDObjectObjects1= [];
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.GDObjectObjects2= [];
 
@@ -1847,9 +2071,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFadeOutEasing((typeof eventsFunctionContext !== 'undefined' ? "" + eventsFunctionContext.getArgument("Value") : ""));
+    gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setFadeOutEasing("" + eventsFunctionContext.getArgument("Value"));
 }
-}}
+}
+}
 
 }
 
@@ -1860,6 +2085,7 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1875,6 +2101,9 @@ var eventsFunctionContext = {
 , "ButtonFSM": this._getButtonFSM()
 , "Tween": this._getTween()
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ButtonStates"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ButtonStates"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1887,14 +2116,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1902,7 +2132,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1922,6 +2152,9 @@ gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ButtonStates__ButtonColorTintTween.ButtonColorTintTween.prototype.SetFadeOutEasingContext.GDObjectObjects2.length = 0;
+
 
 return;
 }

@@ -6,9 +6,10 @@ if (typeof gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS !== "undefined") {
 }
 
 gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS = {};
+gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS.idToCallbackMap = new Map();
 
 
-gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS.userFunc0xaaf0c8 = function GDJSInlineCode(runtimeScene, eventsFunctionContext) {
+gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS.userFunc0xc8a858 = function GDJSInlineCode(runtimeScene, eventsFunctionContext) {
 var format_time = function (time_second) {
     date = new Date(null);
     date.setSeconds(time_second);
@@ -26,7 +27,7 @@ gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS.eventsList0 = function(runtimeScene
 {
 
 
-gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS.userFunc0xaaf0c8(runtimeScene, typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined);
+gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS.userFunc0xc8a858(runtimeScene, eventsFunctionContext);
 
 }
 
@@ -34,6 +35,7 @@ gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS.userFunc0xaaf0c8(runtimeScene, type
 };
 
 gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS.func = function(runtimeScene, TimeInSeconds, parentEventsFunctionContext) {
+let scopeInstanceContainer = null;
 var eventsFunctionContext = {
   _objectsMap: {
 },
@@ -41,6 +43,9 @@ var eventsFunctionContext = {
 },
   _behaviorNamesMap: {
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("TimeFormatter"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("TimeFormatter"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -53,14 +58,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -68,7 +74,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -86,6 +92,7 @@ if (argName === "TimeInSeconds") return TimeInSeconds;
 
 
 gdjs.evtsExt__TimeFormatter__SecondsToHHMMSS.eventsList0(runtimeScene, eventsFunctionContext);
+
 
 return "" + eventsFunctionContext.returnValue;
 }

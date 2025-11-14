@@ -6,6 +6,7 @@ if (typeof gdjs.evtsExt__CameraShake__CameraShake !== "undefined") {
 }
 
 gdjs.evtsExt__CameraShake__CameraShake = {};
+gdjs.evtsExt__CameraShake__CameraShake.idToCallbackMap = new Map();
 
 
 gdjs.evtsExt__CameraShake__CameraShake.eventsList0 = function(runtimeScene, eventsFunctionContext) {
@@ -15,11 +16,12 @@ gdjs.evtsExt__CameraShake__CameraShake.eventsList0 = function(runtimeScene, even
 
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
-{isConditionTrue_0 = ((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("ShakePeriod")) || 0 : 0) != 0);
+{isConditionTrue_0 = ((Number(eventsFunctionContext.getArgument("ShakePeriod")) || 0) != 0);
 }
 if (isConditionTrue_0) {
-{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultFrequency").setNumber(1 / (typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("ShakePeriod")) || 0 : 0));
-}}
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultFrequency").setNumber(1 / (Number(eventsFunctionContext.getArgument("ShakePeriod")) || 0));
+}
+}
 
 }
 
@@ -29,11 +31,12 @@ if (isConditionTrue_0) {
 
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
-{isConditionTrue_0 = ((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("ShakePeriod")) || 0 : 0) == 0);
+{isConditionTrue_0 = ((Number(eventsFunctionContext.getArgument("ShakePeriod")) || 0) == 0);
 }
 if (isConditionTrue_0) {
 {runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultFrequency").setNumber(1 / 0.08);
-}}
+}
+}
 
 }
 
@@ -46,8 +49,10 @@ if (isConditionTrue_0) {
 let isConditionTrue_0 = false;
 {
 {gdjs.evtTools.variable.variableClearChildren(runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Layers"));
-}{gdjs.evtsExt__CameraShake__SetLayerShakable.func(runtimeScene, true, (typeof eventsFunctionContext !== 'undefined' ? "" + eventsFunctionContext.getArgument("Layer") : ""), (typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
-}}
+}
+{gdjs.evtsExt__CameraShake__SetLayerShakable.func(runtimeScene, true, "" + eventsFunctionContext.getArgument("Layer"), eventsFunctionContext);
+}
+}
 
 }
 
@@ -58,15 +63,24 @@ let isConditionTrue_0 = false;
 let isConditionTrue_0 = false;
 {
 {runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Time").setNumber(0);
-}{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Layer").setString((typeof eventsFunctionContext !== 'undefined' ? "" + eventsFunctionContext.getArgument("Layer") : ""));
-}{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Duration").setNumber((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("Duration")) || 0 : 0));
-}{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("StartEaseDuration").setNumber(0);
-}{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("StopEaseDuration").setNumber((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("Duration")) || 0 : 0));
-}{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultAmplitudeX").setNumber(Math.abs((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("AmplitudeX")) || 0 : 0)));
-}{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultAmplitudeY").setNumber(Math.abs((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("AmplitudeY")) || 0 : 0)));
-}{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultAmplitudeAngle").setNumber((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("AmplitudeAngle")) || 0 : 0));
-}{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultAmplitudeZoom").setNumber(1 + (typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("AmplitudeZoom")) || 0 : 0) / 100);
 }
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Layer").setString("" + eventsFunctionContext.getArgument("Layer"));
+}
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Duration").setNumber((Number(eventsFunctionContext.getArgument("Duration")) || 0));
+}
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("StartEaseDuration").setNumber(0);
+}
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("StopEaseDuration").setNumber((Number(eventsFunctionContext.getArgument("Duration")) || 0));
+}
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultAmplitudeX").setNumber(Math.abs((Number(eventsFunctionContext.getArgument("AmplitudeX")) || 0)));
+}
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultAmplitudeY").setNumber(Math.abs((Number(eventsFunctionContext.getArgument("AmplitudeY")) || 0)));
+}
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultAmplitudeAngle").setNumber((Number(eventsFunctionContext.getArgument("AmplitudeAngle")) || 0));
+}
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultAmplitudeZoom").setNumber(1 + (Number(eventsFunctionContext.getArgument("AmplitudeZoom")) || 0) / 100);
+}
+
 { //Subevents
 gdjs.evtsExt__CameraShake__CameraShake.eventsList0(runtimeScene, eventsFunctionContext);} //End of subevents
 }
@@ -86,11 +100,12 @@ gdjs.evtsExt__CameraShake__CameraShake.eventsList0(runtimeScene, eventsFunctionC
 
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
-{isConditionTrue_0 = (typeof eventsFunctionContext !== 'undefined' ? !!eventsFunctionContext.getArgument("ShakeForever") : false);
+{isConditionTrue_0 = !!eventsFunctionContext.getArgument("ShakeForever");
 }
 if (isConditionTrue_0) {
 {runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Duration").setNumber(1234567890);
-}}
+}
+}
 
 }
 
@@ -110,7 +125,8 @@ isConditionTrue_0 = false;
 isConditionTrue_0 = gdjs.evtTools.variable.getVariableNumber(runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Duration")) == 0;
 if (isConditionTrue_0) {
 {runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Duration").setNumber(0.5);
-}}
+}
+}
 
 }
 
@@ -127,6 +143,7 @@ gdjs.evtsExt__CameraShake__CameraShake.eventsList1(runtimeScene, eventsFunctionC
 };
 
 gdjs.evtsExt__CameraShake__CameraShake.func = function(runtimeScene, AmplitudeX, AmplitudeY, Layer, Camera, Duration, AmplitudeAngle, AmplitudeZoom, ShakePeriod, ShakeForever, parentEventsFunctionContext) {
+let scopeInstanceContainer = null;
 var eventsFunctionContext = {
   _objectsMap: {
 },
@@ -134,6 +151,9 @@ var eventsFunctionContext = {
 },
   _behaviorNamesMap: {
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("CameraShake"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("CameraShake"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -146,14 +166,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -161,7 +182,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -187,6 +208,7 @@ if (argName === "ShakeForever") return ShakeForever;
 
 
 gdjs.evtsExt__CameraShake__CameraShake.eventsList2(runtimeScene, eventsFunctionContext);
+
 
 return;
 }

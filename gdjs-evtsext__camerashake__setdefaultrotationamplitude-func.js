@@ -6,6 +6,7 @@ if (typeof gdjs.evtsExt__CameraShake__SetDefaultRotationAmplitude !== "undefined
 }
 
 gdjs.evtsExt__CameraShake__SetDefaultRotationAmplitude = {};
+gdjs.evtsExt__CameraShake__SetDefaultRotationAmplitude.idToCallbackMap = new Map();
 
 
 gdjs.evtsExt__CameraShake__SetDefaultRotationAmplitude.eventsList0 = function(runtimeScene, eventsFunctionContext) {
@@ -16,7 +17,8 @@ gdjs.evtsExt__CameraShake__SetDefaultRotationAmplitude.eventsList0 = function(ru
 let isConditionTrue_0 = false;
 {
 {runtimeScene.getScene().getVariables().get("__CameraShake").getChild("DefaultAmplitudeAngle").setNumber(eventsFunctionContext.getArgument("AmplitudeAngle"));
-}}
+}
+}
 
 }
 
@@ -24,6 +26,7 @@ let isConditionTrue_0 = false;
 };
 
 gdjs.evtsExt__CameraShake__SetDefaultRotationAmplitude.func = function(runtimeScene, AmplitudeAngle, parentEventsFunctionContext) {
+let scopeInstanceContainer = null;
 var eventsFunctionContext = {
   _objectsMap: {
 },
@@ -31,6 +34,9 @@ var eventsFunctionContext = {
 },
   _behaviorNamesMap: {
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("CameraShake"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("CameraShake"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -43,14 +49,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -58,7 +65,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -76,6 +83,7 @@ if (argName === "AmplitudeAngle") return AmplitudeAngle;
 
 
 gdjs.evtsExt__CameraShake__SetDefaultRotationAmplitude.eventsList0(runtimeScene, eventsFunctionContext);
+
 
 return;
 }

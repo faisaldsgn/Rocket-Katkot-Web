@@ -6,6 +6,7 @@ if (typeof gdjs.evtsExt__CameraShake__StopShaking !== "undefined") {
 }
 
 gdjs.evtsExt__CameraShake__StopShaking = {};
+gdjs.evtsExt__CameraShake__StopShaking.idToCallbackMap = new Map();
 
 
 gdjs.evtsExt__CameraShake__StopShaking.eventsList0 = function(runtimeScene, eventsFunctionContext) {
@@ -16,9 +17,12 @@ gdjs.evtsExt__CameraShake__StopShaking.eventsList0 = function(runtimeScene, even
 let isConditionTrue_0 = false;
 {
 {runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Time").setNumber(0);
-}{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Duration").setNumber(eventsFunctionContext.getArgument("EaseDuration"));
-}{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("StopEaseDuration").setNumber(eventsFunctionContext.getArgument("EaseDuration"));
-}}
+}
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("Duration").setNumber(eventsFunctionContext.getArgument("EaseDuration"));
+}
+{runtimeScene.getScene().getVariables().get("__CameraShake").getChild("StopEaseDuration").setNumber(eventsFunctionContext.getArgument("EaseDuration"));
+}
+}
 
 }
 
@@ -26,6 +30,7 @@ let isConditionTrue_0 = false;
 };
 
 gdjs.evtsExt__CameraShake__StopShaking.func = function(runtimeScene, EaseDuration, parentEventsFunctionContext) {
+let scopeInstanceContainer = null;
 var eventsFunctionContext = {
   _objectsMap: {
 },
@@ -33,6 +38,9 @@ var eventsFunctionContext = {
 },
   _behaviorNamesMap: {
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("CameraShake"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("CameraShake"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -45,14 +53,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -60,7 +69,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -78,6 +87,7 @@ if (argName === "EaseDuration") return EaseDuration;
 
 
 gdjs.evtsExt__CameraShake__StopShaking.eventsList0(runtimeScene, eventsFunctionContext);
+
 
 return;
 }

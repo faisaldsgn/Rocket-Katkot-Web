@@ -52,6 +52,47 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner = class ObjectSpawner e
     return true;
   }
 
+  // Network sync:
+  getNetworkSyncData(syncOptions) {
+    return {
+      ...super.getNetworkSyncData(syncOptions),
+      props: {
+        
+    SpawnPeriod: this._behaviorData.SpawnPeriod,
+    OffsetX: this._behaviorData.OffsetX,
+    OffsetY: this._behaviorData.OffsetY,
+    JustSpawnedAnObject: this._behaviorData.JustSpawnedAnObject,
+    MaxQuantityReached: this._behaviorData.MaxQuantityReached,
+    MaxQuantity: this._behaviorData.MaxQuantity,
+    SpawnerCapacity: this._behaviorData.SpawnerCapacity,
+    UnlimitedCapacity: this._behaviorData.UnlimitedCapacity,
+    RandomPosition: this._behaviorData.RandomPosition,
+      }
+    };
+  }
+  updateFromNetworkSyncData(networkSyncData, options) {
+    super.updateFromNetworkSyncData(networkSyncData, options);
+    
+    if (networkSyncData.props.SpawnPeriod !== undefined)
+      this._behaviorData.SpawnPeriod = networkSyncData.props.SpawnPeriod;
+    if (networkSyncData.props.OffsetX !== undefined)
+      this._behaviorData.OffsetX = networkSyncData.props.OffsetX;
+    if (networkSyncData.props.OffsetY !== undefined)
+      this._behaviorData.OffsetY = networkSyncData.props.OffsetY;
+    if (networkSyncData.props.JustSpawnedAnObject !== undefined)
+      this._behaviorData.JustSpawnedAnObject = networkSyncData.props.JustSpawnedAnObject;
+    if (networkSyncData.props.MaxQuantityReached !== undefined)
+      this._behaviorData.MaxQuantityReached = networkSyncData.props.MaxQuantityReached;
+    if (networkSyncData.props.MaxQuantity !== undefined)
+      this._behaviorData.MaxQuantity = networkSyncData.props.MaxQuantity;
+    if (networkSyncData.props.SpawnerCapacity !== undefined)
+      this._behaviorData.SpawnerCapacity = networkSyncData.props.SpawnerCapacity;
+    if (networkSyncData.props.UnlimitedCapacity !== undefined)
+      this._behaviorData.UnlimitedCapacity = networkSyncData.props.UnlimitedCapacity;
+    if (networkSyncData.props.RandomPosition !== undefined)
+      this._behaviorData.RandomPosition = networkSyncData.props.RandomPosition;
+  }
+
   // Properties:
   
   _getSpawnPeriod() {
@@ -148,6 +189,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.getSharedData = functio
 
 // Methods:
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedContext.GDObjectObjects2= [];
 
@@ -163,7 +205,8 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectS
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedContext.GDObjectObjects1[i].resetTimer("__ObjectSpawner.SpawnTimer");
 }
-}}
+}
+}
 
 }
 
@@ -174,6 +217,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreated = f
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -187,6 +231,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -199,14 +246,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -214,7 +262,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -233,10 +281,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedCont
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onCreatedContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateContext.GDObjectObjects2= [];
 
@@ -252,7 +304,8 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectS
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateContext.GDObjectObjects1[i].unpauseTimer("__ObjectSpawner.SpawnTimer");
 }
-}}
+}
+}
 
 }
 
@@ -263,6 +316,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivate = 
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -276,6 +330,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -288,14 +345,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -303,7 +361,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -322,10 +380,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateCon
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onActivateContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateContext.GDObjectObjects2= [];
 
@@ -341,7 +403,8 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectS
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateContext.GDObjectObjects1[i].pauseTimer("__ObjectSpawner.SpawnTimer");
 }
-}}
+}
+}
 
 }
 
@@ -352,6 +415,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivate 
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -365,6 +429,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -377,14 +444,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -392,7 +460,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -411,10 +479,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateC
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.onDeActivateContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1_1final = [];
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2_1final = [];
@@ -450,7 +522,7 @@ isConditionTrue_0 = false;
 }
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(12348260);
+{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(14496716);
 }
 }
 if (isConditionTrue_0) {
@@ -458,7 +530,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[i].resetTimer("__ObjectSpawner.SpawnTimer");
 }
-}}
+}
+}
 
 }
 
@@ -483,7 +556,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setMaxQuantityReached(true);
 }
-}}
+}
+}
 
 }
 
@@ -499,7 +573,8 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectS
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setMaxQuantityReached(false);
 }
-}}
+}
+}
 
 }
 
@@ -528,7 +603,7 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpaw
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-isConditionTrue_0 = gdjs.evtTools.linkedObjects.pickObjectsLinkedTo(runtimeScene, gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.mapOfGDgdjs_9546evtsExt_9595_9595ObjectSpawner_9595_9595ObjectSpawner_9546ObjectSpawner_9546prototype_9546SpawnObjectContext_9546GDObjectToSpawnObjects1Objects, (gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length !== 0 ? gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0] : null), (typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined));
+isConditionTrue_0 = gdjs.evtTools.linkedObjects.pickObjectsLinkedTo(runtimeScene, gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.mapOfGDgdjs_9546evtsExt_9595_9595ObjectSpawner_9595_9595ObjectSpawner_9546ObjectSpawner_9546prototype_9546SpawnObjectContext_9546GDObjectToSpawnObjects1Objects, (gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length !== 0 ? gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0] : null), eventsFunctionContext);
 }
 if (isConditionTrue_0) {
 
@@ -608,7 +683,8 @@ gdjs.copyArray(gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototyp
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects2.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects2[i].setCenterPositionInScene((( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[0].getAABBCenterX()) + (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getOffsetX()),(( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[0].getAABBCenterY()) + (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getOffsetY()));
 }
-}}
+}
+}
 
 }
 
@@ -627,7 +703,7 @@ gdjs.copyArray(gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototyp
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
 for (var i = 0, k = 0, l = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length;i<l;++i) {
-    if ( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).RandomPosition((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined)) ) {
+    if ( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).RandomPosition(eventsFunctionContext) ) {
         isConditionTrue_0 = true;
         gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[k] = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[i];
         ++k;
@@ -640,7 +716,8 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects1[i].setCenterPositionInScene((( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0].getAABBLeft()) + gdjs.random((( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0].getWidth())),(( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0].getAABBTop()) + gdjs.random((( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0].getHeight())));
 }
-}}
+}
+}
 
 }
 
@@ -662,9 +739,11 @@ let isConditionTrue_0 = false;
 /* Reuse gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1 */
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects1.length = 0;
 
-{gdjs.evtTools.object.createObjectOnScene((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : runtimeScene), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.mapOfGDgdjs_9546evtsExt_9595_9595ObjectSpawner_9595_9595ObjectSpawner_9546ObjectSpawner_9546prototype_9546SpawnObjectContext_9546GDObjectToSpawnObjects1Objects, (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0].getAABBCenterX()), (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0].getAABBCenterY()), (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0].getLayer()));
-}{gdjs.evtTools.linkedObjects.linkObjects(runtimeScene, (gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects1.length !== 0 ? gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects1[0] : null), (gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length !== 0 ? gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0] : null));
+{gdjs.evtTools.object.createObjectOnScene(eventsFunctionContext, gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.mapOfGDgdjs_9546evtsExt_9595_9595ObjectSpawner_9595_9595ObjectSpawner_9546ObjectSpawner_9546prototype_9546SpawnObjectContext_9546GDObjectToSpawnObjects1Objects, (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0].getAABBCenterX()), (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0].getAABBCenterY()), (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length === 0 ) ? "" :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0].getLayer()));
 }
+{gdjs.evtTools.linkedObjects.linkObjects(runtimeScene, (gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects1.length !== 0 ? gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects1[0] : null), (gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length !== 0 ? gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[0] : null));
+}
+
 { //Subevents
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.eventsList2(runtimeScene, eventsFunctionContext);} //End of subevents
 }
@@ -690,7 +769,8 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectS
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setJustSpawnedAnObject(false);
 }
-}}
+}
+}
 
 }
 
@@ -735,7 +815,7 @@ isConditionTrue_0 = false;
 gdjs.copyArray(gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1, gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2);
 
 for (var i = 0, k = 0, l = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2.length;i<l;++i) {
-    if ( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).UnlimitedObjectCapacity((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined)) ) {
+    if ( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).UnlimitedObjectCapacity(eventsFunctionContext) ) {
         isConditionTrue_1 = true;
         gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[k] = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[i];
         ++k;
@@ -754,7 +834,7 @@ if(isConditionTrue_1) {
 gdjs.copyArray(gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1, gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2);
 
 for (var i = 0, k = 0, l = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2.length;i<l;++i) {
-    if ( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).SpawnerCapacity((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined)) > 0 ) {
+    if ( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).SpawnerCapacity(eventsFunctionContext) > 0 ) {
         isConditionTrue_1 = true;
         gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[k] = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2[i];
         ++k;
@@ -780,13 +860,16 @@ if (isConditionTrue_0) {
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[i].resetTimer("__ObjectSpawner.SpawnTimer");
 }
-}{for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length ;i < len;++i) {
+}
+{for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setSpawnerCapacity(gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getSpawnerCapacity() - (1));
 }
-}{for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length ;i < len;++i) {
+}
+{for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setJustSpawnedAnObject(true);
 }
 }
+
 { //Subevents
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.eventsList3(runtimeScene, eventsFunctionContext);} //End of subevents
 }
@@ -816,6 +899,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObject =
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -831,6 +915,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -843,14 +930,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -858,7 +946,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -881,10 +969,18 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectCo
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects3.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.eventsList5(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects2.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectObjects3.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects2.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnObjectContext.GDObjectToSpawnObjects3.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.GDObjectObjects2= [];
 
@@ -898,9 +994,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setOffsetX((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("Value")) || 0 : 0));
+    gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setOffsetX((Number(eventsFunctionContext.getArgument("Value")) || 0));
 }
-}}
+}
+}
 
 }
 
@@ -911,6 +1008,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetX = 
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -924,6 +1022,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -936,14 +1037,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -951,7 +1053,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -971,10 +1073,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXCon
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetXContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.GDObjectObjects2= [];
 
@@ -988,9 +1094,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setOffsetY((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("Value")) || 0 : 0));
+    gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setOffsetY((Number(eventsFunctionContext.getArgument("Value")) || 0));
 }
-}}
+}
+}
 
 }
 
@@ -1001,6 +1108,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetY = 
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1014,6 +1122,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1026,14 +1137,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1041,7 +1153,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1061,10 +1173,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYCon
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetOffsetYContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.GDObjectObjects2= [];
 
@@ -1078,9 +1194,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setSpawnPeriod((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("Value")) || 0 : 0));
+    gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setSpawnPeriod((Number(eventsFunctionContext.getArgument("Value")) || 0));
 }
-}}
+}
+}
 
 }
 
@@ -1091,6 +1208,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPerio
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1104,6 +1222,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1116,14 +1237,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1131,7 +1253,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1151,10 +1273,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPerio
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnPeriodContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.GDObjectObjects2= [];
 
@@ -1167,7 +1293,8 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContex
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getOffsetX()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getOffsetX());}
+}
 
 }
 
@@ -1178,6 +1305,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetX = fun
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1191,6 +1319,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1203,14 +1334,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1218,7 +1350,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1238,10 +1370,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContex
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetXContext.GDObjectObjects2.length = 0;
+
 
 return Number(eventsFunctionContext.returnValue) || 0;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.GDObjectObjects2= [];
 
@@ -1254,7 +1390,8 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContex
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getOffsetY()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getOffsetY());}
+}
 
 }
 
@@ -1265,6 +1402,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetY = fun
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1278,6 +1416,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1290,14 +1431,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1305,7 +1447,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1325,10 +1467,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContex
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.OffsetYContext.GDObjectObjects2.length = 0;
+
 
 return Number(eventsFunctionContext.returnValue) || 0;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.GDObjectObjects2= [];
 
@@ -1341,7 +1487,8 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodCo
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getSpawnPeriod()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getSpawnPeriod());}
+}
 
 }
 
@@ -1352,6 +1499,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriod =
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1365,6 +1513,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1377,14 +1528,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1392,7 +1544,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1411,10 +1563,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodCo
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnPeriodContext.GDObjectObjects2.length = 0;
+
 
 return Number(eventsFunctionContext.returnValue) || 0;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTimerContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTimerContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTimerContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTimerContext.GDObjectObjects2= [];
 
@@ -1430,7 +1586,8 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectS
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTimerContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTimerContext.GDObjectObjects1[i].resetTimer("__ObjectSpawner.SpawnTimer");
 }
-}}
+}
+}
 
 }
 
@@ -1441,6 +1598,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTim
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1454,6 +1612,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1466,14 +1627,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1481,7 +1643,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1500,10 +1662,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTim
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTimerContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTimerContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTimerContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ResetSpawnTimerContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1_1final = [];
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1= [];
@@ -1535,7 +1701,7 @@ isConditionTrue_0 = false;
 gdjs.copyArray(gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1, gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2);
 
 for (var i = 0, k = 0, l = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2.length;i<l;++i) {
-    if ( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).UnlimitedObjectCapacity((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined)) ) {
+    if ( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).UnlimitedObjectCapacity(eventsFunctionContext) ) {
         isConditionTrue_1 = true;
         gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2[k] = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2[i];
         ++k;
@@ -1554,7 +1720,7 @@ if(isConditionTrue_1) {
 gdjs.copyArray(gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1, gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2);
 
 for (var i = 0, k = 0, l = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2.length;i<l;++i) {
-    if ( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).SpawnerCapacity((typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext : undefined)) > 0 ) {
+    if ( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior")).SpawnerCapacity(eventsFunctionContext) > 0 ) {
         isConditionTrue_1 = true;
         gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2[k] = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2[i];
         ++k;
@@ -1576,7 +1742,8 @@ gdjs.copyArray(gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototyp
 }
 if (isConditionTrue_0) {
 /* Reuse gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1 */
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getSpawnPeriod()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getSpawnPeriod());}
+}
 
 }
 
@@ -1597,7 +1764,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpaw
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
 /* Reuse gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1 */
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getSpawnPeriod()) - (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1[0].getTimerElapsedTimeInSeconds("__ObjectSpawner.SpawnTimer")); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getSpawnPeriod()) - (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1[0].getTimerElapsedTimeInSeconds("__ObjectSpawner.SpawnTimer"));}
+}
 
 }
 
@@ -1608,6 +1776,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpa
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1621,6 +1790,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1633,14 +1805,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1648,7 +1821,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1667,10 +1840,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpa
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.TimeBeforeSpawnContext.GDObjectObjects2.length = 0;
+
 
 return Number(eventsFunctionContext.returnValue) || 0;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJustSpawnedContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJustSpawnedContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJustSpawnedContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJustSpawnedContext.GDObjectObjects2= [];
 
@@ -1692,7 +1869,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpaw
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJustSpawnedContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -1703,6 +1881,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJust
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1716,6 +1895,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1728,14 +1910,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1743,7 +1926,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1762,10 +1945,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJust
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJustSpawnedContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJustSpawnedContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJustSpawnedContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.ObjectWasJustSpawnedContext.GDObjectObjects2.length = 0;
+
 
 return !!eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.GDObjectObjects2= [];
 
@@ -1778,7 +1965,8 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityCo
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getMaxQuantity()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getMaxQuantity());}
+}
 
 }
 
@@ -1789,6 +1977,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantity =
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1802,6 +1991,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1814,14 +2006,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1829,7 +2022,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1848,10 +2041,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityCo
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.MaxQuantityContext.GDObjectObjects2.length = 0;
+
 
 return Number(eventsFunctionContext.returnValue) || 0;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.GDObjectObjects2= [];
 
@@ -1865,9 +2062,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setMaxQuantity((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("Value")) || 0 : 0));
+    gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setMaxQuantity((Number(eventsFunctionContext.getArgument("Value")) || 0));
 }
-}}
+}
+}
 
 }
 
@@ -1878,6 +2076,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantit
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1891,6 +2090,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1903,14 +2105,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -1918,7 +2121,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -1938,10 +2141,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantit
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetMaxQuantityContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObjectCapacityContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObjectCapacityContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObjectCapacityContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObjectCapacityContext.GDObjectObjects2= [];
 
@@ -1963,7 +2170,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpaw
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObjectCapacityContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -1974,6 +2182,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObje
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -1987,6 +2196,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -1999,14 +2211,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -2014,7 +2227,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -2033,10 +2246,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObje
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObjectCapacityContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObjectCapacityContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObjectCapacityContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.UnlimitedObjectCapacityContext.GDObjectObjects2.length = 0;
+
 
 return !!eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects2= [];
 
@@ -2048,14 +2265,15 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedO
 
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
-{isConditionTrue_0 = !(typeof eventsFunctionContext !== 'undefined' ? !!eventsFunctionContext.getArgument("Value") : false);
+{isConditionTrue_0 = !eventsFunctionContext.getArgument("Value");
 }
 if (isConditionTrue_0) {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setUnlimitedCapacity(false);
 }
-}}
+}
+}
 
 }
 
@@ -2065,14 +2283,15 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectS
 
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
-{isConditionTrue_0 = (typeof eventsFunctionContext !== 'undefined' ? !!eventsFunctionContext.getArgument("Value") : false);
+{isConditionTrue_0 = !!eventsFunctionContext.getArgument("Value");
 }
 if (isConditionTrue_0) {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setUnlimitedCapacity(true);
 }
-}}
+}
+}
 
 }
 
@@ -2083,6 +2302,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedO
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -2096,6 +2316,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -2108,14 +2331,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -2123,7 +2347,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -2143,10 +2367,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedO
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetUnlimitedObjectCapacityContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.GDObjectObjects2= [];
 
@@ -2159,7 +2387,8 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapaci
 let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.GDObjectObjects1);
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getSpawnerCapacity()); }}}
+{eventsFunctionContext.returnValue = (( gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.GDObjectObjects1.length === 0 ) ? 0 :gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.GDObjectObjects1[0].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._getSpawnerCapacity());}
+}
 
 }
 
@@ -2170,6 +2399,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapaci
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -2183,6 +2413,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -2195,14 +2428,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -2210,7 +2444,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -2229,10 +2463,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapaci
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SpawnerCapacityContext.GDObjectObjects2.length = 0;
+
 
 return Number(eventsFunctionContext.returnValue) || 0;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.GDObjectObjects2= [];
 
@@ -2246,9 +2484,10 @@ let isConditionTrue_0 = false;
 {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.GDObjectObjects1.length ;i < len;++i) {
-    gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setSpawnerCapacity((typeof eventsFunctionContext !== 'undefined' ? Number(eventsFunctionContext.getArgument("Value")) || 0 : 0));
+    gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setSpawnerCapacity((Number(eventsFunctionContext.getArgument("Value")) || 0));
 }
-}}
+}
+}
 
 }
 
@@ -2259,6 +2498,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCap
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -2272,6 +2512,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -2284,14 +2527,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -2299,7 +2543,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -2319,10 +2563,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCap
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetSpawnerCapacityContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositionContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositionContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositionContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositionContext.GDObjectObjects2= [];
 
@@ -2344,7 +2592,8 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpaw
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositionContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
-{if (typeof eventsFunctionContext !== 'undefined') { eventsFunctionContext.returnValue = true; }}}
+{eventsFunctionContext.returnValue = true;}
+}
 
 }
 
@@ -2355,6 +2604,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositio
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -2368,6 +2618,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -2380,14 +2633,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -2395,7 +2649,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -2414,10 +2668,14 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositio
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositionContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositionContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositionContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.RandomPositionContext.GDObjectObjects2.length = 0;
+
 
 return !!eventsFunctionContext.returnValue;
 }
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext = {};
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.idToCallbackMap = new Map();
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects1= [];
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects2= [];
 
@@ -2429,14 +2687,15 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPosi
 
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
-{isConditionTrue_0 = !(typeof eventsFunctionContext !== 'undefined' ? !!eventsFunctionContext.getArgument("Value") : false);
+{isConditionTrue_0 = !eventsFunctionContext.getArgument("Value");
 }
 if (isConditionTrue_0) {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setRandomPosition(false);
 }
-}}
+}
+}
 
 }
 
@@ -2446,14 +2705,15 @@ gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectS
 
 let isConditionTrue_0 = false;
 isConditionTrue_0 = false;
-{isConditionTrue_0 = (typeof eventsFunctionContext !== 'undefined' ? !!eventsFunctionContext.getArgument("Value") : false);
+{isConditionTrue_0 = !!eventsFunctionContext.getArgument("Value");
 }
 if (isConditionTrue_0) {
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects1);
 {for(var i = 0, len = gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects1.length ;i < len;++i) {
     gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects1[i].getBehavior(eventsFunctionContext.getBehaviorName("Behavior"))._setRandomPosition(true);
 }
-}}
+}
+}
 
 }
 
@@ -2464,6 +2724,7 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPosi
 
 var that = this;
 var runtimeScene = this._runtimeScene;
+let scopeInstanceContainer = null;
 var thisObjectList = [this.owner];
 var Object = Hashtable.newFrom({Object: thisObjectList});
 var Behavior = this.name;
@@ -2477,6 +2738,9 @@ var eventsFunctionContext = {
   _behaviorNamesMap: {
 "Behavior": Behavior
 },
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ObjectSpawner"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ObjectSpawner"),
+  localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
   },
@@ -2489,14 +2753,15 @@ var eventsFunctionContext = {
   createObject: function(objectName) {
     const objectsList = eventsFunctionContext._objectsMap[objectName];
     if (objectsList) {
-      const object = parentEventsFunctionContext ?
+      const object = parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
         parentEventsFunctionContext.createObject(objectsList.firstKey()) :
         runtimeScene.createObject(objectsList.firstKey());
       if (object) {
         objectsList.get(objectsList.firstKey()).push(object);
         eventsFunctionContext._objectArraysMap[objectName].push(object);
       }
-      return object;    }
+      return object;
+    }
     return null;
   },
   getInstancesCountOnScene: function(objectName) {
@@ -2504,7 +2769,7 @@ var eventsFunctionContext = {
     let count = 0;
     if (objectsList) {
       for(const objectName in objectsList.items)
-        count += parentEventsFunctionContext ?
+        count += parentEventsFunctionContext && !(scopeInstanceContainer && scopeInstanceContainer.isObjectRegistered(objectName)) ?
 parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
         runtimeScene.getInstancesCountOnScene(objectName);
     }
@@ -2524,6 +2789,9 @@ gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPosi
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects2.length = 0;
 
 gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects1.length = 0;
+gdjs.evtsExt__ObjectSpawner__ObjectSpawner.ObjectSpawner.prototype.SetRandomPositionContext.GDObjectObjects2.length = 0;
+
 
 return;
 }
